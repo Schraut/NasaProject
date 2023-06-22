@@ -6,9 +6,19 @@ const http = require('http');
 
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-  console.log(`Api is running on port ${PORT}`)
-})
+const { loadPlanetsData } = require('./models/planets.model');
+
+// Start server and load planets data
+async function startServerAndLoadData() {
+  await loadPlanetsData();
+
+  server.listen(PORT, () => {
+    console.log(`Api is running on port ${PORT}`);
+  })
+}
+
+startServerAndLoadData();
+
 
 // Start api server, run:
 // npm start

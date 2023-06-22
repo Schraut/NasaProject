@@ -4,6 +4,8 @@
 const { parse } = require('csv-parse');
 // parse needs a stream to be able to read the file
 const fs = require('fs');
+// this is for getting the correct path to the csv file
+const path = require('path');
 
 // This array will store the data that is coming in
 const habitablePlanets = [];
@@ -18,29 +20,37 @@ function isPlanetHabitable(planet) {
     && planet[stellarFlux] < 1.11
     && planet[planetRadius] < 1.6;
 }
+function loadPlanetsData() {
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(path.join(__dirname, '..', '..', 'data', 'kepler_data.csv'))
+      .pipe(parse({ // pipe connects the parse function with fs
+        comment: '#',
+        columns: true,
+      }))
+      .on('data', (data) => { // on is an event handler
+        if (isPlanetHabitable(data)) {
+          habitablePlanets.push(data);
+        }
 
-fs.createReadStream('kepler_data.csv')
-  .pipe(parse({ // pipe connects the parse function with fs
-    comment: '#',
-    columns: true,
-  }))
-  .on('data', (data) => { // on is an event handler
-    if (isPlanetHabitable(data)) {
-      habitablePlanets.push(data);
-    }
+      })
+      .on('error', (err) => {
+        console.log(`Error: ${err}`)
+        reject(err);
+      })
+      .on('end', () => {
+        console.log(`${habitablePlanets.length} habitable planets found :)`);
+        console.log(habitablePlanets.map((planet) => {
+          return planet[planetName];
+        }))
+        console.log('All complete');
+        resolve();
+      });
+  });
 
-  })
-  .on('error', (err) => {
-    console.log(`Error: ${err}`)
-  })
-  .on('end', () => {
-    console.log(`${habitablePlanets.length} habitable planets found :)`);
-    console.log(habitablePlanets.map((planet) => {
-      return planet[planetName];
-    }))
-    console.log('All complete');
-  })
+}
+
 
 module.exports = {
+  loadPlanetsData,
   planets: habitablePlanets,
 }
