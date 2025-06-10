@@ -10,6 +10,7 @@ const { loadPlanetsData } = require('./models/planets.model');
 
 // Start server and load planets data
 async function startServerAndLoadData() {
+  // this makes sure the planets data is loaded before the server starts
   await loadPlanetsData();
 
   server.listen(PORT, () => {
