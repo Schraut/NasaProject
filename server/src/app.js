@@ -23,9 +23,9 @@ app.use(express.json());
 * Then use express.static to connect app.js to the public folder that was created by the client's build script
 */
 app.use(express.static(path.join(__dirname, '..', 'public')));
-// connecting routers to express
-app.use(planetsRouter);
-app.use(launchesRouter);
+// connecting routers to express and naming the routes
+app.use('/planets', planetsRouter);
+app.use('/launches', launchesRouter);
 // Connect public's index.html file
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
